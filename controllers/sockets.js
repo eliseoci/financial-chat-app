@@ -51,26 +51,24 @@ const handler = (io) => {
 
     // When a bot message arrives
     socket.on(Constants.NEW_BOT_MESSAGE, async (roomId, message) => {
-      const msg = await Message.create({ ...message, roomId });
-      const messageDTO = getMessageDTO(msg);
-      socket.nsp.to(roomId).emit(Constants.ADD_MESSAGE, messageDTO);
+      socket.nsp.to(roomId).emit(Constants.ADD_MESSAGE, message);
     });
 
     // When a new message arrives
     socket.on(Constants.NEW_MESSAGE, async (roomId, message) => {
       const { content, username } = message;
-      const msg = await Message.create({ content, username, roomId });
-      const messageDTO = getMessageDTO(msg);
-
-      socket.broadcast.to(roomId).emit(Constants.ADD_MESSAGE, messageDTO);
-
       const commandRegex = new RegExp('^/');
+      let messageDTO = message;
       // Check if message is a command
       if (Utils.isMatch(content, commandRegex) && content.length > 1) {
         const queue = process.env.QUEUE_NAME;
         const stringifiedMessage = JSON.stringify({ ...message, roomId });
         QueueService.publishToQueue(queue, stringifiedMessage);
+      } else {
+        const msg = await Message.create({ content, username, roomId });
+        messageDTO = getMessageDTO(msg);
       }
+      socket.broadcast.to(roomId).emit(Constants.ADD_MESSAGE, messageDTO);
     });
   });
 };
