@@ -1,9 +1,9 @@
 # Financial Chat App by Eliseo Cohen Imach
 
 ## Prerequisites
-Node.js v8.x.x
-MongoDB installed locally or a cloud based instance
-RabbitMQ installed locally or a cloud based instance
+1. Node.js v8.x.x
+2. MongoDB installed locally or a cloud based instance
+3. RabbitMQ installed locally or a cloud based instance
 
 ## Quick install
 1. Run npm install
@@ -17,4 +17,10 @@ RabbitMQ installed locally or a cloud based instance
 3. Run npm start
     ```
     $ npm start
+    ```
+## Testing
+
+Run tests
+   ```
+    $ npm run test
     ```
