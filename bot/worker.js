@@ -37,7 +37,7 @@ const formatContent = (stock) => {
 
 const handleError = (err) => {
   if (err) {
-    throw err;
+    console.error(err);
   }
 };
 
