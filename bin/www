@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+const http = require('http');
+const socketIo = require('socket.io');
+const { fork } = require('child_process');
+const app = require('../app');
+const ioHandler = require('../controllers/sockets');
+const session = require('../middlewares/session');
+
+const server = http.createServer(app);
+const io = socketIo(server);
+const port = process.env.SOCKET_IO_PORT || 5000;
+
+// Start bot worker
+fork('./bot/worker.js').send('start');
+
+io.use((socket, next) => {
+  session(socket.request, {}, next);
+});
+
+ioHandler(io);
+
+process
+  .on('unhandledRejection', (reason, p) => {
+    console.error(reason, 'Unhandled Rejection at Promise', p);
+  })
+  .on('uncaughtException', (err) => {
+    console.error(err, 'Uncaught Exception thrown');
+    process.exit(1);
+  });
+
+server.listen(port, () => console.log(`Server is running on port ${port}`));
